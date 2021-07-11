@@ -13,17 +13,21 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import com.morningnightdream.clone_twitter.ui.theme.CloneTwitterTheme
+import com.morningnightdream.clone_twitter.ui.theme.TwitterTheme
+import kotlin.math.ln
+
+// check done
 
 @Composable
 fun TweetSurface(
     modifier: Modifier = Modifier,
     shape: Shape = RectangleShape,
-    color: Color = Color.Black,
-    contentColor: Color = Color.Black,
+    color: Color = TwitterTheme.colors.uiBackground,
+    contentColor: Color = TwitterTheme.colors.textSecondary,
     border: BorderStroke? = null,
     elevation: Dp = 0.dp,
     content: @Composable () -> Unit
@@ -34,11 +38,33 @@ fun TweetSurface(
             .zIndex(elevation.value)
             .then(if (border != null) Modifier.border(border, shape) else Modifier)
             .background(
-                color = color,
+                color = getBackgroundColorForElevation(color, elevation),
                 shape = shape
             )
             .clip(shape)
     ) {
         CompositionLocalProvider(LocalContentColor provides contentColor, content = content)
     }
+}
+
+@Composable
+private fun getBackgroundColorForElevation(
+    color: Color,
+    elevation: Dp
+): Color {
+    return if (elevation > 0.dp) {
+        color.withElevation(elevation)
+    } else {
+        color
+    }
+}
+
+private fun Color.withElevation(elevation: Dp): Color {
+    val foreground = calculateForeground(elevation)
+    return foreground.compositeOver(this)
+}
+
+private fun calculateForeground(elevation: Dp): Color {
+    val alpha = ((4.5f * ln(elevation.value + 1)) + 2f) / 20f
+    return Color.White.copy(alpha = alpha)
 }

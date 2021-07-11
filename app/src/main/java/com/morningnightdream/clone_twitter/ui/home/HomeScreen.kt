@@ -18,11 +18,11 @@ import com.morningnightdream.clone_twitter.ui.home.stories.UserStoriesRepository
 @Composable
 fun HomeScreen(
     navigateToTweet: (String) -> Unit?,
+    modifierPadding: PaddingValues,
     navigateToHashTagSearch: (String) -> Unit?,
     tweetsViewModel: TweetsViewModel
 ) {
     val tweetState = tweetsViewModel.tweetsState
-    Log.i("hasegawa", "HomeScreen ${tweetState}")
     LazyColumn {
         item {
             ComposeStoriesWithSpacing()
